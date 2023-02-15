@@ -8,6 +8,7 @@ authors = ["Albina <aalmukhametova@gmail.com>"]
 python = "^3.8"
 Django = "^4.0.1"
 pillow = "^9.4.0"
+djangorestframework = "^3.14.0"
 
 [tool.poetry.dev-dependencies]
 

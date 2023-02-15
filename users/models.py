@@ -14,11 +14,14 @@ class Location(models.Model):
         return self.name
 
 
-class UserRoles:
-    MEMBER = 'member'
-    MODERATOR = 'moderator'
-    ADMIN = 'admin'
-    choices = ((MEMBER, 'Пользователь'), (ADMIN, 'Администратор'), (MODERATOR, 'Модератор'))
+class UserRoles(models.TextChoices):
+    MEMBER = 'member', 'Пользователь'
+    MODERATOR = 'moderator', 'Модератор'
+    ADMIN = 'admin', 'Админ'
+    # MEMBER = 'member'
+    # MODERATOR = 'moderator'
+    # ADMIN = 'admin'
+    # choices = ((MEMBER, 'Пользователь'), (ADMIN, 'Администратор'), (MODERATOR, 'Модератор'))
 
 
 class User(models.Model):
@@ -36,3 +39,8 @@ class User(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+    @property
+    def username(self):
+        return self.username if self.username else None
+

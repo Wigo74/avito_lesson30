@@ -39,7 +39,7 @@ def conv_json(csv_file, json_file, model):
         jf.write(json.dumps(result, ensure_ascii=False))
 
 
-# conv_json(f"{ADS}.csv", f"{ADS}.json", 'ads.ad')
-# conv_json(f"{CATEGORY}.csv", f"{CATEGORY}.json", 'ads.category')
+conv_json(f"{ADS}.csv", f"{ADS}.json", 'ads.ad')
+conv_json(f"{CATEGORY}.csv", f"{CATEGORY}.json", 'ads.category')
 conv_json(f"{USER}.csv", f"{USER}.json", 'users.user')
-# conv_json(f"{LOC}.csv", f"{LOC}.json", 'users.location')
+conv_json(f"{LOC}.csv", f"{LOC}.json", 'users.location')

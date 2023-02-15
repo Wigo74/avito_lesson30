@@ -10,13 +10,6 @@ from django.views.generic import DetailView, ListView, CreateView, DeleteView, U
 from ads.models import Category
 
 
-#
-# def root(request):
-#     return JsonResponse({
-#         "status": "ok"
-#     })
-
-
 @method_decorator(csrf_exempt, name='dispatch')
 class CategoryLstView(ListView):
     model = Category
@@ -55,9 +48,10 @@ class CategoryCreateView(CreateView):
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
         data = json.loads(request.body)
+
         cat = Category.objects.create(
-                name=data['name']
-            )
+            name=data['name']
+        )
 
         return JsonResponse({
             "id": cat.id,
