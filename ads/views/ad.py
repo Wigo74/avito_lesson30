@@ -1,17 +1,16 @@
 import json
 
-from django.core.paginator import Paginator
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import DetailView, CreateView, ListView, UpdateView, DeleteView
+from django.views.generic import UpdateView
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.viewsets import ModelViewSet
 
-from ads.models import Ad, Category
+from ads.models import Ad
+from ads.permissions import IsOwnerSelection, IsOwnerAdOrStaff
 from ads.serialazers import AdSerializer, AdDetailSerializer
-from avito.settings import TOTAL_ON_PAGE
-from users.models import User
 
 
 def root(request):
@@ -24,8 +23,19 @@ class AdViewSet(ModelViewSet):
     queryset = Ad.objects.order_by('-price')
     default_serializer = AdSerializer
     serializer_class = {
-        'retrieve': AdDetailSerializer
+        'retrieve': AdDetailSerializer,
+
     }
+    default_permission = [AllowAny()]
+    permissions = {
+        'create': [IsAuthenticated()],
+        'update': [IsAuthenticated(), IsOwnerAdOrStaff()],
+        'partial_update': [IsAuthenticated(), IsOwnerAdOrStaff()],
+        'destroy': [IsAuthenticated(), IsOwnerAdOrStaff()]
+    }
+
+    def get_permissions(self):
+        return self.permissions.get(self.action, self.default_permission)
 
     def get_serializer_class(self):
         return self.serializer_class.get(self.action, self.default_serializer)
@@ -68,3 +78,5 @@ class AdUploadImage(UpdateView):
                              "is_published": self.object.is_published,
                              "image": self.object.image.url if self.object.image else None
                              }, safe=False)
+
+

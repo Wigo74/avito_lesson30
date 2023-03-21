@@ -14,6 +14,9 @@ class UserListSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+    def get_total_ads(self, user):
+        return user.ad_set.filter(is_published=True).count()
+
 
 class UserDetailSerializer(serializers.ModelSerializer):
     location = serializers.SlugRelatedField(
@@ -28,7 +31,6 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-
     location = serializers.SlugRelatedField(
         required=False,
         # queryset=Location.objects.all(),
@@ -46,6 +48,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
         for loc_name in self._locations:
             location, _ = Location.objects.get_or_create(name=loc_name)
             user.location.add(location)
+        user.set_password(validated_data['password'])
+        user.save()
         return user
 
     class Meta:
@@ -62,22 +66,16 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         slug_field='name'
     )
 
-    # def is_valid(self, *, raise_exception=False):
-    #     self._location = self.initial_data.pop("location", [])
-    #     return super().is_valid(raise_exception=raise_exception)
+    def is_valid(self, *, raise_exception=False):
+        self._location = self.initial_data.pop("location", [])
+        return super().is_valid(raise_exception=raise_exception)
 
-    def update(self, instance, validated_data):
-        location_data = validated_data.pop('location')
-        location = instance.location
-
-        instance = validated_data.get("location", instance.location)
-        instance.save()
-
-        # user = User.objects.update(**validated_data)
-        # for loc_name in self._locations:
-        #     location, _ = Location.objects.get_or_create(name=loc_name)
-        #     user.location.add(location)
-        return instance
+    def safe(self, **kwargs):
+        user = User.objects.update(**kwargs)
+        for loc_name in self._location:
+            location, _ = Location.objects.get_or_create(name=loc_name)
+            user.location.add(location)
+        return user
 
     class Meta:
         model = User
