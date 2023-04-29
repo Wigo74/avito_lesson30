@@ -10,7 +10,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from ads.models import Ad
 from ads.permissions import IsOwnerSelection, IsOwnerAdOrStaff
-from ads.serialazers import AdSerializer, AdDetailSerializer
+from ads.serialazers import AdSerializer, AdDetailSerializer, AdListSerializer, AdCreateSerializer
 
 
 def root(request):
@@ -22,17 +22,20 @@ def root(request):
 class AdViewSet(ModelViewSet):
     queryset = Ad.objects.order_by('-price')
     default_serializer = AdSerializer
-    serializer_class = {
-        'retrieve': AdDetailSerializer,
 
-    }
     default_permission = [AllowAny()]
     permissions = {
-        'create': [IsAuthenticated()],
+        'retrieve': [IsAuthenticated()],
         'update': [IsAuthenticated(), IsOwnerAdOrStaff()],
         'partial_update': [IsAuthenticated(), IsOwnerAdOrStaff()],
         'destroy': [IsAuthenticated(), IsOwnerAdOrStaff()]
     }
+
+    serializer_class = {
+        'list': AdListSerializer,
+        'create': AdCreateSerializer,
+        'retrieve': AdDetailSerializer,
+        }
 
     def get_permissions(self):
         return self.permissions.get(self.action, self.default_permission)
